@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Clases - Admin</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: #1e293b;
+            color: white;
+            position: fixed;
+            width: 250px;
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #3b82f6;
+            color: white;
+            font-weight: bold;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="p-4 text-center border-bottom border-secondary mb-3">
+            <i class="fa-solid fa-shield-halved fs-1 mb-2 text-warning"></i>
+            <h5 class="mb-0">Administración</h5>
+        </div>
+        <a th:href="@{/panel/admin/estudiantes}"><i class="fa-solid fa-users me-2"></i> Alumnos</a>
+        <a th:href="@{/panel/admin/instructores}"><i class="fa-solid fa-chalkboard-user me-2"></i> Instructores</a>
+        <a th:href="@{/panel/admin/clases}" class="active"><i class="fa-solid fa-layer-group me-2"></i> Clases y
+            Zonas</a>
+        <a th:href="@{/panel/admin/pagos}"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Pagos</a>
+        <a th:href="@{/panel/admin/pqrs}"><i class="fa-solid fa-envelope-open-text me-2"></i> PQRS y Contacto</a>
+        <a th:href="@{/logout}" class="text-danger mt-5"><i class="fa-solid fa-right-from-bracket me-2"></i> Cerrar
+            Sesión</a>
+    </div>
+
+    <div class="main-content">
+        <h2 class="mb-4 fw-bold">Gestión de Clases y Oferta Deportiva</h2>
+
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i><span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Formulario para Crear Nueva Clase -->
+        <div class="table-card mb-4">
+            <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="fa-solid fa-plus-circle text-primary me-2"></i>Crear
+                Nueva Clase</h5>
+            <form th:action="@{/panel/admin/clases}" th:object="${nuevaClase}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold small">Nombre de la Clase</label>
+                        <input type="text" class="form-control" th:field="*{nombre}" placeholder="Ej. Semilleros A"
+                            required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold small">Nivel</label>
+                        <select class="form-select" th:field="*{nivel}">
+                            <option value="Semilleros (Iniciación)">Semilleros (Iniciación)</option>
+                            <option value="Formativo (Intermedio)">Formativo (Intermedio)</option>
+                            <option value="Élite (Competencia)">Élite (Competencia)</option>
+                            <option value="Libre">Práctica Libre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold small">Horario</label>
+                        <input type="text" class="form-control" th:field="*{horario}" placeholder="Ej. Lun-Mié 4:00 PM"
+                            required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold small">Escenario Deportivo</label>
+                        <input type="text" class="form-control" th:field="*{escenario}"
+                            placeholder="Patinódromo Alegría" required>
+                    </div>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Instructor Asignado</label>
+                        <select class="form-select" th:field="*{instructor.id}">
+                            <option value="">-- Sin Instructor Inicial --</option>
+                            <option th:each="inst : ${instructores}" th:value="${inst.id}"
+                                th:text="${inst.nombre + ' (' + inst.especialidad + ')'}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100 shadow-sm"><i
+                                class="fa-solid fa-save me-2"></i>Guardar Clase</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de Clases -->
+        <div class="table-card">
+            <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="fa-solid fa-list-check text-primary me-2"></i>Clases
+                Programadas</h5>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Detalle de la Clase</th>
+                            <th>Nivel</th>
+                            <th>Horario y Lugar</th>
+                            <th>Instructor Asignado</th>
+                            <th>Alumnos Inscritos</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="clase : ${clases}">
+                            <td class="fw-bold" th:text="${clase.nombre}">Clase</td>
+                            <td><span class="badge bg-info text-dark" th:text="${clase.nivel}">Nivel</span></td>
+                            <td>
+                                <small class="d-block"><i class="fa-regular fa-clock me-1 text-muted"></i><span
+                                        th:text="${clase.horario}">Horario</span></small>
+                                <small class="d-block"><i class="fa-solid fa-location-dot me-1 text-danger"></i><span
+                                        th:text="${clase.escenario}">Lugar</span></small>
+                            </td>
+                            <td>
+                                <span th:if="${clase.instructor != null}" class="fw-semibold text-primary"
+                                    th:text="${clase.instructor.nombre}">Instructor</span>
+                                <span th:if="${clase.instructor == null}" class="text-muted fst-italic">No
+                                    Asignado</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary rounded-pill px-3"
+                                    th:text="${clase.estudiantes.size()}">0</span>
+                            </td>
+                            <td class="text-center">
+                                <!-- Placeholders for future sub-tasks -->
+                                <a href="#" class="btn btn-sm btn-outline-secondary" title="Ver Alumnos"><i
+                                        class="fa-solid fa-users"></i></a>
+                            </td>
+                        </tr>
+                        <tr th:if="${clases.empty}">
+                            <td colspan="6" class="text-center text-muted py-4">No hay clases programadas en el sistema.
+                                Usa el formulario superior para crear una.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

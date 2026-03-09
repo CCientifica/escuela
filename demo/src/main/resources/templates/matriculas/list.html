@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Matrículas - Escuela App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Escuela App</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/estudiantes">Estudiantes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/cursos">Cursos</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/matriculas">Matrículas</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Matrículas</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a href="/matriculas/nueva" class="btn btn-sm btn-outline-info">Nueva Matrícula</a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">ID Matrícula</th>
+                        <th scope="col">Estudiante</th>
+                        <th scope="col">Curso</th>
+                        <th scope="col">Fecha Matrícula</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="matricula : ${matriculas}">
+                        <td th:text="${matricula.id}">1</td>
+                        <td th:text="${matricula.estudiante.nombre}">Juan Pérez</td>
+                        <td th:text="${matricula.curso.nombre}">Matemáticas 101</td>
+                        <td th:text="${matricula.fechaMatricula}">2023-10-26</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+
+</html>

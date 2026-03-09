@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Inscripción de Instructores - Academia Roller Speed</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7fa;
+            padding-top: 5rem;
+            color: #1e293b;
+        }
+
+        /* Nav moderna (Estilo EduAdmin original) */
+        .navbar {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* Form Card */
+        .form-card {
+            border: none;
+            border-radius: 1.5rem;
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border-top: 5px solid #10b981;
+            /* Verde para instructores */
+        }
+
+        .form-header {
+            padding: 2.5rem 2rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .form-icon {
+            font-size: 3rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+            background: #ecfdf5;
+            height: 80px;
+            width: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .form-body {
+            padding: 2.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .btn-modern-success {
+            background: #10b981;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.8rem 2rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100%;
+        }
+
+        .btn-modern-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(16, 185, 129, 0.25);
+        }
+
+        .alert-modern {
+            border-radius: 1rem;
+            border: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar Pública -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="/index">
+                <i class="fa-solid fa-person-skating me-2 text-primary"></i>Roller Speed
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsExample">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+                    <li class="nav-item"><a class="nav-link" href="/corporativo">Valores Corporativos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/servicios-eventos">Eventos de la escuela</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Registro</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/registro/estudiantes">Inscripción de Estudiantes</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/registro/instructor">Inscripción de Instructor</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/clases-publicas">Calendario de Clases</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+
+                <div class="form-card">
+                    <div class="form-header">
+                        <div class="form-icon">
+                            <i class="fa-solid fa-id-badge"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark">Inscripción de Instructores</h2>
+                        <p class="text-secondary mt-2 mb-0 small text-start p-3 bg-light rounded"
+                            style="border-left: 4px solid #3b82f6;">
+                            <i class="fa-solid fa-briefcase text-primary me-2"></i><strong>Perfil Profesional:</strong>
+                            Registro de hoja de vida y certificaciones para el cuerpo docente. Completa tus datos para
+                            postularte.
+                        </p>
+                    </div>
+
+                    <div class="form-body">
+
+                        <!-- Mensajes de Alerta -->
+                        <div th:if="${mensajeExito}"
+                            class="alert alert-success alert-modern alert-dismissible fade show" role="alert">
+                            <i class="fa-solid fa-circle-check me-2"></i><span th:text="${mensajeExito}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${mensajeError}" class="alert alert-danger alert-modern alert-dismissible fade show"
+                            role="alert">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i><span th:text="${mensajeError}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Formulario de Registro -->
+                        <form th:action="@{/registro/instructor}" th:object="${instructor}" method="post">
+
+                            <div class="mb-4">
+                                <label for="nombre" class="form-label">Nombre Completo <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fa-regular fa-user text-secondary"></i></span>
+                                    <input type="text" class="form-control border-start-0 ps-0" id="nombre"
+                                        th:field="*{nombre}" placeholder="Ej. Carlos Martínez" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="especialidad" class="form-label">Especialidad <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="especialidad" th:field="*{especialidad}" required>
+                                        <option value="" selected disabled>Seleccione especialidad...</option>
+                                        <option value="Velocidad">Patinaje de Velocidad</option>
+                                        <option value="Artístico">Patinaje Artístico</option>
+                                        <option value="Recreativo">Recreativo / Urbano</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label for="anosExperiencia" class="form-label">Años de Experiencia <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i
+                                                class="fa-solid fa-medal text-secondary"></i></span>
+                                        <input type="number" class="form-control border-start-0 ps-0"
+                                            id="anosExperiencia" th:field="*{anosExperiencia}" min="0"
+                                            placeholder="Ej. 5" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="telefono" class="form-label">Teléfono de Contacto <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i
+                                                class="fa-solid fa-phone text-secondary"></i></span>
+                                        <input type="tel" class="form-control border-start-0 ps-0" id="telefono"
+                                            th:field="*{telefono}" placeholder="Celular" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-5">
+                                    <label for="correoElectronico" class="form-label">Correo Electrónico <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i
+                                                class="fa-regular fa-envelope text-secondary"></i></span>
+                                        <input type="email" class="form-control border-start-0 ps-0"
+                                            id="correoElectronico" th:field="*{correoElectronico}"
+                                            placeholder="correo@ejemplo.com" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label for="password" class="form-label">Contraseña de Acceso <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fa-solid fa-lock text-secondary"></i></span>
+                                    <input type="password" class="form-control border-start-0 ps-0" id="password"
+                                        name="password" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                                </div>
+                                <div class="form-text">Esta contraseña te servirá para ingresar a tu panel de
+                                    instructor.</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-modern-success">
+                                Registrar Perfil Docente <i class="fa-solid fa-check ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

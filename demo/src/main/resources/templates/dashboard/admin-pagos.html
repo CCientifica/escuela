@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión Financiera - Admin</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: #1e293b;
+            color: white;
+            position: fixed;
+            width: 250px;
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #3b82f6;
+            color: white;
+            font-weight: bold;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="p-4 text-center border-bottom border-secondary mb-3">
+            <i class="fa-solid fa-shield-halved fs-1 mb-2 text-warning"></i>
+            <h5 class="mb-0">Administración</h5>
+        </div>
+        <a th:href="@{/panel/admin/estudiantes}"><i class="fa-solid fa-users me-2"></i> Alumnos</a>
+        <a th:href="@{/panel/admin/instructores}"><i class="fa-solid fa-chalkboard-user me-2"></i> Instructores</a>
+        <a th:href="@{/panel/admin/clases}"><i class="fa-solid fa-layer-group me-2"></i> Clases y Zonas</a>
+        <a th:href="@{/panel/admin/pagos}" class="active"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Pagos</a>
+        <a th:href="@{/panel/admin/pqrs}"><i class="fa-solid fa-envelope-open-text me-2"></i> PQRS y Contacto</a>
+        <a th:href="@{/logout}" class="text-danger mt-5"><i class="fa-solid fa-right-from-bracket me-2"></i> Cerrar
+            Sesión</a>
+    </div>
+
+    <div class="main-content">
+        <h2 class="mb-4 fw-bold">Gestión Financiera de la Escuela</h2>
+
+        <!-- Resumen Financiero -->
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <div class="stat-card h-100">
+                    <h5 class="fw-normal mb-3"><i class="fa-solid fa-wallet me-2"></i>Ingresos Totales (Recaudado)</h5>
+                    <h1 class="fw-bold mb-0 display-5" th:text="${'$ ' + ingresosTotales}">$ 0</h1>
+                    <p class="mt-2 mb-0 opacity-75 small">Este valor es la sumatoria de todas las transacciones
+                        exitosas registradas en firme.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stat-card-danger h-100">
+                    <h5 class="fw-normal mb-3"><i class="fa-solid fa-hand-holding-dollar me-2"></i>Cartera Pendiente
+                    </h5>
+                    <h1 class="fw-bold mb-0 display-5" th:text="${'$ ' + carteraTotal}">$ 0</h1>
+                    <p class="mt-2 mb-0 opacity-75 small">Estudiantes activos sin registros de pago válidos (Falta de
+                        inscripción).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Pagos Globales -->
+        <div class="table-card mb-5 border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-money-check-dollar text-success me-2"></i>Historial
+                    Operativo de Facturación (Pagos Efectivos)</h5>
+                <button class="btn btn-sm btn-outline-success"><i class="fa-solid fa-file-excel me-1"></i>Exportar
+                    Excel</button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Referencia</th>
+                            <th>Fecha de Transacción</th>
+                            <th>Alumno Remitente</th>
+                            <th>Método</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="pago : ${pagos}">
+                            <td class="text-muted fw-bold">#<span th:text="${pago.id}"></span></td>
+                            <td th:text="${pago.fechaHoraPago}">2026-01-01 10:00</td>
+                            <td class="fw-semibold">
+                                <a th:href="@{/panel/admin/estudiantes/{id}(id=${pago.estudiante.id})}"
+                                    class="text-decoration-none text-success"
+                                    th:text="${pago.estudiante.nombreCompleto}">Alumno</a>
+                            </td>
+                            <td><span class="badge bg-secondary" th:text="${pago.metodoPago}">T.C.</span></td>
+                            <td class="fw-bold text-success">$50,000</td>
+                            <td><i class="fa-solid fa-circle-check text-success fs-5"></i></td>
+                        </tr>
+                        <tr th:if="${pagos.empty}">
+                            <td colspan="6" class="text-center text-muted py-4">No hay transacciones ni ingresos
+                                registrados en la base de datos financiera.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabla de Cartera (Morosos / Pendientes) -->
+        <div class="table-card border-start border-4 border-danger">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Gestión de
+                    Cartera (Pendientes de Cobro)</h5>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Identificación</th>
+                            <th>Alumno Moroso</th>
+                            <th>Contacto Directo</th>
+                            <th>Alerta Base</th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="moroso : ${estudiantesEnMora}">
+                            <td class="text-muted fw-bold border-danger-subtle border-start border-3"
+                                th:text="${moroso.documentoIdentidad}">#000</td>
+                            <td class="fw-semibold">
+                                <a th:href="@{/panel/admin/estudiantes/{id}(id=${moroso.id})}"
+                                    class="text-decoration-none text-danger" th:text="${moroso.nombreCompleto}">Alumno
+                                    Moroso</a>
+                            </td>
+                            <td>
+                                <small class="d-block text-muted"><i class="fa-solid fa-envelope me-1"></i><span
+                                        th:text="${moroso.correoElectronico}"></span></small>
+                                <small class="d-block text-muted"><i class="fa-solid fa-phone me-1"></i><span
+                                        th:text="${moroso.telefono}"></span></small>
+                            </td>
+                            <td><span class="badge bg-danger rounded-pill">Falta Inscripción</span></td>
+                            <td class="text-center">
+                                <a th:href="@{/panel/admin/estudiantes/{id}(id=${moroso.id})}"
+                                    class="btn btn-sm btn-outline-danger">Recordatorio / Suspender</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${estudiantesEnMora.empty}">
+                            <td colspan="5" class="text-center text-muted py-4"><i
+                                    class="fa-solid fa-check-circle text-success me-2"></i>¡Excelente! No hay alumnos
+                                enlistados en cartera morosa.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

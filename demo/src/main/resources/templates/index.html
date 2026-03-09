@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Academia Roller Speed</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7fa;
+            padding-top: 5rem;
+            color: #2b3abf;
+        }
+
+        /* Nav moderna (Estilo EduAdmin original) */
+        .navbar {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* Dashboard Header */
+        .hero-section {
+            text-align: center;
+            padding: 4rem 0 3rem;
+            margin-bottom: 2rem;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .hero-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            color: #64748b;
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tarjetas interactivas */
+        .module-card {
+            border: none;
+            border-radius: 1.25rem;
+            background: #ffffff;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 60%, rgba(37, 99, 235, 0.05) 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.1);
+        }
+
+        .module-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            padding: 1.25rem;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 1rem;
+            display: inline-flex;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .module-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .card-title {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-text {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-modern {
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+
+        .btn-modern-primary {
+            background: #2563eb;
+            border: none;
+            color: white;
+        }
+
+        .btn-modern-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            color: white;
+        }
+
+        .btn-modern-success {
+            background: #10b981;
+            border: none;
+            color: white;
+        }
+
+        .btn-modern-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            color: white;
+        }
+
+        .btn-modern-purple {
+            background: #8b5cf6;
+            border: none;
+            color: white;
+        }
+
+        .btn-modern-purple:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar Pública - Estructura solicitada con diseño EduAdmin -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="/index">
+                <i class="fa-solid fa-person-skating me-2 text-primary"></i>Roller Speed
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarsExampleDefault">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+
+                    <!-- Valores Corporativos -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarValores" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Valores Corporativos
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarValores">
+                            <li><a class="dropdown-item" href="/corporativo">Corporativo</a></li>
+                            <li><a class="dropdown-item" href="/corporativo#mision">Misión</a></li>
+                            <li><a class="dropdown-item" href="/corporativo#vision">Visión</a></li>
+                            <li><a class="dropdown-item" href="/corporativo#valores">Valores</a></li>
+                            <li><a class="dropdown-item" href="/servicios-eventos">Servicios</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Eventos -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/servicios-eventos">Eventos de la escuela</a>
+                    </li>
+
+                    <!-- Registro -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarRegistro" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Registro
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarRegistro">
+                            <li><a class="dropdown-item" href="/registro/estudiantes">Inscripción de Estudiantes</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/registro/instructor">Inscripción de Instructor</a></li>
+                            <li><a class="dropdown-item" href="/registro/clases">Clases</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Calendario u Horario de Clases -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clases-publicas">Calendario de Clases</a>
+                    </li>
+
+                </ul>
+                <div class="d-flex align-items-center">
+                    <!-- Si NO hay sesión -->
+                    <th:block sec:authorize="isAnonymous()">
+                        <div class="text-light me-3 small"><i class="fa-regular fa-user me-1"></i> Área Privada</div>
+                        <a href="/login" class="btn btn-primary btn-sm rounded-pill fw-bold">Login</a>
+                    </th:block>
+
+                    <!-- Si SÍ hay sesión -->
+                    <th:block sec:authorize="isAuthenticated()">
+                        <!-- Botón a su panel dependiendo del rol -->
+                        <a sec:authorize="hasRole('ESTUDIANTE')" href="/panel/estudiante"
+                            class="btn btn-outline-light btn-sm rounded-pill fw-bold me-2"><i
+                                class="fa-solid fa-gauge me-1"></i> Mi Panel</a>
+                        <a sec:authorize="hasRole('INSTRUCTOR')" href="/panel/instructor"
+                            class="btn btn-outline-light btn-sm rounded-pill fw-bold me-2"><i
+                                class="fa-solid fa-gauge me-1"></i> Panel Docente</a>
+
+                        <!-- Saludo y Logout -->
+                        <div class="dropdown">
+                            <button class="btn btn-primary btn-sm rounded-pill fw-bold dropdown-toggle" type="button"
+                                id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-user-circle me-1"></i> <span
+                                    th:text="${#strings.substringBefore(#authentication.name, '@')}">User</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userMenu">
+                                <li>
+                                    <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                                        <button type="submit" class="dropdown-item text-danger border-0 bg-transparent text-start w-100">
+                                            <i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Notificación de Éxito PQRS -->
+        <div th:if="${param.mensajeExito}" class="alert alert-success alert-dismissible fade show m-3 text-center"
+            role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i><strong>¡Mensaje Enviado!</strong> <span
+                th:text="${param.mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="container mt-4 mb-5 pb-5">
+            <div class="hero-section px-4">
+                <div
+                    class="d-inline-block py-1 px-3 rounded-pill bg-primary bg-opacity-10 text-primary fw-bold mb-3 small">
+                    <i class="fa-solid fa-bolt me-1"></i> Academia Roller Speed
+                </div>
+                <h1 class="hero-title display-4">Pasión sobre Ruedas en Santa Marta</h1>
+                <p class="hero-subtitle mb-4">Transformamos la energía y el talento de nuestra juventud en disciplina
+                    deportiva. Únete a la academia de patinaje con mayor proyección de la región.</p>
+                <a href="#contacto" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm px-4">¡Únete Hoy! <i
+                        class="fa-solid fa-arrow-right ms-2"></i></a>
+            </div>
+        </section>
+
+        <!-- Conoce Roller Speed (Historia, Misión, Visión, Logros) -->
+        <section class="bg-white py-5 mb-5 border-top border-bottom">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6">
+                        <h2 class="fw-bold fs-1 mb-4 text-dark">Nuestra Historia: <span class="text-primary">Forjando
+                                Campeones</span></h2>
+                        <p class="lead text-secondary">Nacimos en el corazón de la "Perla de América" con un sueño
+                            claro: transformar la energía de nuestra juventud en disciplina deportiva. Lo que comenzó
+                            como un pequeño grupo de entusiastas en el Patinódromo de la Alegría, es hoy una de las
+                            instituciones más proyectadas de la región.</p>
+                        <p class="text-muted">Desde nuestros primeros pasos, hemos entendido que el patinaje no es solo
+                            velocidad; es el arte de levantarse después de cada caída y la alegría de cruzar la meta
+                            gracias al esfuerzo constante.</p>
+
+                        <h4 class="fw-bold mt-5 mb-3 text-dark">Nuestro Propósito</h4>
+                        <ul class="list-unstyled">
+                            <li class="mb-3"><i class="fa-solid fa-heart-pulse text-danger me-2"></i> <strong>Fomentar
+                                    la Vida Saludable:</strong> Combatir el sedentarismo a través del deporte.</li>
+                            <li class="mb-3"><i class="fa-solid fa-brain text-purple me-2" style="color:#8b5cf6;"></i>
+                                <strong>Desarrollar el Carácter:</strong> Cultivar disciplina, puntualidad y respeto.
+                            </li>
+                            <li class="mb-3"><i class="fa-solid fa-users text-success me-2"></i> <strong>Inclusión
+                                    Deportiva:</strong> Un espacio seguro desde niños hasta nivel competitivo.</li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card bg-light border-0 shadow-sm p-4 rounded-4">
+                            <h3 class="fw-bold text-center mb-4 text-dark"><i
+                                    class="fa-solid fa-trophy text-warning me-2"></i> El Orgullo de Roller Speed</h3>
+
+                            <div class="d-flex align-items-start mb-4">
+                                <div class="bg-primary text-white rounded-circle p-3 me-3"><i
+                                        class="fa-solid fa-graduation-cap fs-4"></i></div>
+                                <div>
+                                    <h5 class="fw-bold mb-1">Formación Integral</h5>
+                                    <p class="text-muted small mb-0">Más de 300 alumnos activos dominando las pistas con
+                                        técnica y seguridad.</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start mb-4">
+                                <div class="bg-success text-white rounded-circle p-3 me-3"><i
+                                        class="fa-solid fa-medal fs-4"></i></div>
+                                <div>
+                                    <h5 class="fw-bold mb-1">Podios Regionales</h5>
+                                    <p class="text-muted small mb-0">Destacada participación en festivales y campeonatos
+                                        departamentales en el Magdalena.</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start mb-4">
+                                <div class="bg-danger text-white rounded-circle p-3 me-3"><i
+                                        class="fa-solid fa-stopwatch fs-4"></i></div>
+                                <div>
+                                    <h5 class="fw-bold mb-1">Cuerpo Técnico Especializado</h5>
+                                    <p class="text-muted small mb-0">Instructores certificados con las últimas
+                                        metodologías de entrenamiento.</p>
+                                </div>
+                            </div>
+
+                            <p class="fst-italic text-center text-primary fw-bold mt-3 mb-0">"No solo patinamos hacia la
+                                meta, rodamos hacia el futuro."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Galería -->
+        <section class="container mb-5 pb-4">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold fs-1 text-dark">Momentos <span class="text-primary">Inolvidables</span></h2>
+                <p class="text-muted">Galería de entrenamientos, eventos y logros de nuestros patinadores.</p>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="rounded-4 overflow-hidden shadow-sm" style="height: 250px;">
+                        <img src="/images/galeria1.jpg" alt="Entrenamientos sobre ruedas" class="w-100 h-100"
+                            style="object-fit: cover; transition: transform 0.3s;"
+                            onmouseover="this.style.transform='scale(1.05)'"
+                            onmouseout="this.style.transform='scale(1)'">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="rounded-4 overflow-hidden shadow-sm bg-dark" style="height: 250px; position:relative;">
+                        <video controls class="w-100 h-100" style="object-fit: cover;" poster="/images/media_video.png">
+                            <source src="/images/media_roller.mp4" type="video/mp4">
+                            Tu navegador no soporta el formato de video.
+                        </video>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="rounded-4 overflow-hidden shadow-sm" style="height: 250px;">
+                        <img src="/images/galeria_nueva.jpg" alt="Logros y Equipo" class="w-100 h-100"
+                            style="object-fit: cover; transition: transform 0.3s;"
+                            onmouseover="this.style.transform='scale(1.05)'"
+                            onmouseout="this.style.transform='scale(1)'">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Noticias y Actualidad -->
+        <section class="bg-light py-5 mb-5 border-top border-bottom">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold fs-1 text-dark">Noticias y Actualidad</h2>
+                    <p class="text-muted">Mantente al tanto de nuestros eventos y la agenda deportiva de Roller Speed.
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Noticia 1 -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 module-card">
+                            <div class="card-body p-4">
+                                <span class="badge bg-primary mb-2">Entrenamientos</span>
+                                <h4 class="fw-bold card-title">¡Brillamos en el Patinódromo de la Alegría!</h4>
+                                <p class="card-text">Nuestros patinadores de niveles Intermedio y Avanzado completaron
+                                    con éxito el primer chequeo técnico del trimestre. Felicitamos a todos por mejorar
+                                    sus tiempos de reacción y técnica de curva.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Noticia 2 -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 module-card">
+                            <div class="card-body p-4">
+                                <span class="badge bg-success mb-2">Competencias</span>
+                                <h4 class="fw-bold card-title">Rumbo al Festival Nacional de Escuelas</h4>
+                                <p class="card-text">Nos preparamos para representar a Santa Marta en el próximo evento
+                                    organizado por Fedepatín. Estamos ajustando los planes formativos para llegar en
+                                    nuestra mejor versión.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agenda -->
+                <h4 class="fw-bold mt-5 mb-4 text-center text-dark"><i
+                        class="fa-regular fa-calendar-check text-primary me-2"></i> Próximos Eventos: ¡Agenda tu Pasión!
+                </h4>
+                <div class="row g-4 justify-content-center">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="p-3 border rounded-3 bg-white h-100 border-start border-primary border-4 shadow-sm">
+                            <h6 class="fw-bold text-primary mb-1">1° Festival de Escuelas Roller Speed</h6>
+                            <p class="small text-muted mb-2"><i class="fa-solid fa-location-dot me-1"></i> Polideportivo
+                                Santa Marta</p>
+                            <p class="small mb-0">Jornada de integración para todos los niveles y entrega de insignias
+                                de progreso. (Evento Interno).</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="p-3 border rounded-3 bg-white h-100 border-start border-success border-4 shadow-sm">
+                            <h6 class="fw-bold text-success mb-1">Santa Marta Night Run 2026</h6>
+                            <p class="small text-muted mb-2"><i class="fa-solid fa-calendar me-1"></i> 29 de Marzo de
+                                2026</p>
+                            <p class="small mb-0">Acompañaremos en los puntos de hidratación apoyando la cultura
+                                deportiva de la ciudad.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="p-3 border rounded-3 bg-white h-100 border-start border-warning border-4 shadow-sm">
+                            <h6 class="fw-bold text-warning mb-1">Parada Nacional Interclubes</h6>
+                            <p class="small text-muted mb-2"><i class="fa-solid fa-calendar me-1"></i> 20 - 23 de Marzo
+                                de 2026</p>
+                            <p class="small mb-0">Seguimiento Nacional en Buga, Valle, analizando técnicas para nuestras
+                                clases Élite.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonios -->
+        <section class="container mb-5 pb-4">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold fs-1 text-dark">Lo que dice nuestra <span class="text-primary">Comunidad</span></h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card bg-white border-0 shadow-sm p-4 h-100 rounded-4"
+                        style="border-top: 4px solid #3b82f6 !important;">
+                        <div class="text-warning mb-3">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="fst-italic text-secondary mb-4">"La disciplina y el amor con el que enseñan a los
+                            niños es increíble. Mi hija ha mejorado no solo en patinaje sino en su confianza personal."
+                        </p>
+                        <h6 class="fw-bold mb-0 text-dark">María C.</h6>
+                        <small class="text-muted">Madre de Familia</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-white border-0 shadow-sm p-4 h-100 rounded-4"
+                        style="border-top: 4px solid #10b981 !important;">
+                        <div class="text-warning mb-3">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="fst-italic text-secondary mb-4">"Entrenar con instructores certificados me ha
+                            permitido alcanzar el nivel competitivo que buscaba para mi categoría juvenil."</p>
+                        <h6 class="fw-bold mb-0 text-dark">Andrés S.</h6>
+                        <small class="text-muted">Alumno Nivel Avanzado</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-white border-0 shadow-sm p-4 h-100 rounded-4"
+                        style="border-top: 4px solid #f59e0b !important;">
+                        <div class="text-warning mb-3">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-regular fa-star"></i>
+                        </div>
+                        <p class="fst-italic text-secondary mb-4">"Un espacio súper seguro. Empecé de cero siendo adulto
+                            y ahora no falto a ninguna clase. ¡Gran equipo!"</p>
+                        <h6 class="fw-bold mb-0 text-dark">Carlos P.</h6>
+                        <small class="text-muted">Alumno Adulto Principiante</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Red de Módulos (Antiguo Index) -->
+        <section sec:authorize="hasRole('ADMIN')"
+            class="container mb-5 bg-white p-5 rounded-4 shadow-sm border">
+            <div class="text-center mb-5">
+                <span class="badge bg-danger mb-2 px-3 py-2 rounded-pill"><i class="fa-solid fa-lock me-1"></i>
+                    Administración</span>
+                <h3 class="fw-bold text-dark">Módulos Administrativos Rápidos</h3>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="card module-card p-3 text-center border">
+                        <div class="card-body p-0">
+                            <div class="card-icon mx-auto mb-3"><i class="fa-solid fa-users"></i></div>
+                            <h5 class="fw-bold">Gestión Estudiantil</h5>
+                            <a href="/panel/admin/estudiantes" class="btn btn-sm btn-outline-primary mt-2">Acceder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card module-card p-3 text-center border">
+                        <div class="card-body p-0">
+                            <div class="card-icon mx-auto mb-3" style="background:#ecfdf5; color:#10b981;"><i
+                                    class="fa-solid fa-calendar-check"></i></div>
+                            <h5 class="fw-bold">Gestión de Clases</h5>
+                            <a href="/panel/admin/clases" class="btn btn-sm btn-outline-success mt-2">Acceder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card module-card p-3 text-center border">
+                        <div class="card-body p-0">
+                            <div class="card-icon mx-auto mb-3" style="background:#f5f3ff; color:#8b5cf6;"><i
+                                    class="fa-solid fa-money-bill-wave"></i></div>
+                            <h5 class="fw-bold">Gestión Financiera</h5>
+                            <a href="/panel/admin/pagos" class="btn btn-sm btn-outline-purple mt-2">Acceder</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Formulario de Contacto / PQRS -->
+        <section id="contacto" class="bg-dark text-white py-5 rounded-4 shadow-lg mb-5 mx-3 mx-lg-0"
+            style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;">
+            <div class="container py-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="text-center mb-5">
+                            <h2 class="fw-bold fs-1">Contacto y <span class="text-primary">PQRS</span></h2>
+                            <p class="text-light opacity-75">¿Tienes dudas, felicitaciones o reclamos? Escríbenos y te
+                                contactaremos en breve.</p>
+                        </div>
+
+                        <form action="/contacto" method="POST" class="bg-white rounded-4 p-4 p-md-5 text-dark shadow">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Nombre Completo</label>
+                                    <input type="text" name="nombre" class="form-control form-control-lg bg-light"
+                                        required placeholder="Ej. Juan Pérez">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Teléfono de Contacto</label>
+                                    <input type="tel" name="telefono" class="form-control form-control-lg bg-light"
+                                        required placeholder="Ej. 3001234567">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Correo Electrónico</label>
+                                    <input type="email" name="email" class="form-control form-control-lg bg-light"
+                                        required placeholder="tu@correo.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Tipo de Solicitud</label>
+                                    <select name="tipo" class="form-select form-select-lg bg-light" required>
+                                        <option value="Contacto Comercial" selected>Consulta General / Inscripciones
+                                        </option>
+                                        <option value="Petición">Petición</option>
+                                        <option value="Queja">Queja</option>
+                                        <option value="Reclamo">Reclamo</option>
+                                        <option value="Sugerencia">Sugerencia</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <label class="form-label fw-bold">Tu Mensaje</label>
+                                    <textarea name="mensaje" rows="4" class="form-control form-control-lg bg-light"
+                                        required placeholder="Escribe aquí los detalles de tu consulta..."></textarea>
+                                </div>
+                                <div class="col-12 mt-4 text-center">
+                                    <button type="submit"
+                                        class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">
+                                        Enviar Mensaje <i class="fa-regular fa-paper-plane ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer sencillo -->
+    <footer class="text-center text-muted py-4 mt-auto border-top">
+        <small>&copy; 2026 Academia Roller Speed App. Sistema construido basándose en lecciones profesionales de
+            arquitectura Spring
+            Boot MVC.</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Clase - Admin</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: #1e293b;
+            color: white;
+            position: fixed;
+            width: 250px;
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #3b82f6;
+            color: white;
+            font-weight: bold;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="p-4 text-center border-bottom border-secondary mb-3">
+            <i class="fa-solid fa-shield-halved fs-1 mb-2 text-warning"></i>
+            <h5 class="mb-0">Administración</h5>
+        </div>
+        <a th:href="@{/panel/admin/estudiantes}"><i class="fa-solid fa-users me-2"></i> Alumnos</a>
+        <a th:href="@{/panel/admin/instructores}"><i class="fa-solid fa-chalkboard-user me-2"></i> Instructores</a>
+        <a th:href="@{/panel/admin/clases}" class="active"><i class="fa-solid fa-layer-group me-2"></i> Clases y
+            Zonas</a>
+        <a th:href="@{/panel/admin/pagos}"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Pagos</a>
+        <a th:href="@{/panel/admin/pqrs}"><i class="fa-solid fa-envelope-open-text me-2"></i> PQRS y Contacto</a>
+        <a th:href="@{/logout}" class="text-danger mt-5"><i class="fa-solid fa-right-from-bracket me-2"></i> Cerrar
+            Sesión</a>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex align-items-center mb-4">
+            <a th:href="@{/panel/admin/clases}" class="btn btn-outline-secondary me-3"><i
+                    class="fa-solid fa-arrow-left"></i> Volver</a>
+            <h2 class="fw-bold mb-0" th:text="'Gestión de Clase: ' + ${clase.nombre}">Gestión de Clase</h2>
+        </div>
+
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i><span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Info Card -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="table-card h-100">
+                    <h5 class="fw-bold border-bottom pb-2"><i
+                            class="fa-solid fa-circle-info text-primary me-2"></i>Detalles</h5>
+                    <p class="mb-1"><strong>Nivel:</strong> <span class="badge bg-info text-dark"
+                            th:text="${clase.nivel}">Nivel</span></p>
+                    <p class="mb-1"><strong>Horario:</strong> <span th:text="${clase.horario}">Horario</span></p>
+                    <p class="mb-1"><strong>Escenario:</strong> <span th:text="${clase.escenario}">Escenario</span></p>
+                    <p class="mb-0 mt-3 pt-2 border-top">
+                        <strong>Instructor Responsable:</strong>
+                        <span th:if="${clase.instructor != null}" class="text-success fw-bold"
+                            th:text="${clase.instructor.nombre}">Instructor</span>
+                        <span th:if="${clase.instructor == null}" class="text-danger fst-italic">Sin Asignar. Edite la
+                            clase.</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="table-card h-100 bg-light border-0">
+                    <h5 class="fw-bold border-bottom border-secondary pb-2"><i
+                            class="fa-solid fa-user-plus text-primary me-2"></i>Añadir Alumno Registrado</h5>
+                    <form th:action="@{/panel/admin/clases/{id}/agregar-alumno(id=${clase.id})}" method="post">
+                        <label class="form-label small fw-bold">Buscar Alumno Disponible:</label>
+                        <select class="form-select mb-3" name="estudianteId" required>
+                            <option value="">-- Seleccionar Alumno --</option>
+                            <option th:each="est : ${estudiantesDisponibles}" th:value="${est.id}"
+                                th:text="${est.documentoIdentidad + ' - ' + est.nombreCompleto + ' (' + est.nivel + ')'}">
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-primary w-100"><i
+                                class="fa-solid fa-plus me-1"></i>Vincular a esta Clase</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Alumnos en la Clase -->
+        <div class="table-card">
+            <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="fa-solid fa-users text-primary me-2"></i>Alumnos
+                Matriculados en la Clase (<span th:text="${clase.estudiantes.size()}">0</span>)</h5>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Documento</th>
+                            <th>Nombre Completo</th>
+                            <th>Nivel Propio</th>
+                            <th>Contacto</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="estudiante : ${clase.estudiantes}">
+                            <td th:text="${estudiante.documentoIdentidad}">123</td>
+                            <td class="fw-bold" th:text="${estudiante.nombreCompleto}">Nombre</td>
+                            <td><span class="badge bg-secondary" th:text="${estudiante.nivel}">Nivel</span></td>
+                            <td>
+                                <small class="d-block" th:text="${estudiante.telefono}">Tel</small>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-danger" title="Remover de la clase"><i
+                                        class="fa-solid fa-user-minus"></i></button>
+                            </td>
+                        </tr>
+                        <tr th:if="${clase.estudiantes.empty}">
+                            <td colspan="5" class="text-center text-muted py-4">No hay alumnos asignados a esta clase
+                                todavía.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Nueva Fila: Asistencias y Calificaciones de toda la Clase -->
+        <div class="row mt-4">
+            <!-- Asistencias de la Clase -->
+            <div class="col-md-6 mb-4">
+                <div class="table-card h-100 border-start border-4 border-info">
+                    <h5 class="fw-bold border-bottom pb-2 mb-3"><i
+                            class="fa-solid fa-clipboard-list text-info me-2"></i>Asistencias Completas de la Clase</h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Alumno</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="asistencia : ${asistencias}">
+                                    <td th:text="${asistencia.fecha}">2026-03-01</td>
+                                    <td th:text="${asistencia.estudiante.nombreCompleto}">Juan Perez</td>
+                                    <td>
+                                        <span th:if="${asistencia.presente}"
+                                            class="badge bg-success text-white w-100">Presente</span>
+                                        <span th:if="${!asistencia.presente}"
+                                            class="badge bg-danger text-white w-100">Falla</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${asistencias.empty}">
+                                    <td colspan="3" class="text-muted fst-italic py-3">Sin registros de asistencia
+                                        reportados para esta clase.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calificaciones de la Clase -->
+            <div class="col-md-6 mb-4">
+                <div class="table-card h-100 border-start border-4 border-warning">
+                    <h5 class="fw-bold border-bottom pb-2 mb-3"><i
+                            class="fa-solid fa-graduation-cap text-warning me-2"></i>Reporte Integral de Notas y Logros
+                    </h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Alumno</th>
+                                    <th>Nota Alcanzada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="calificacion : ${calificaciones}">
+                                    <td class="text-nowrap" th:text="${calificacion.fecha}">2026-03-02</td>
+                                    <td th:text="${calificacion.estudiante.nombreCompleto}">Juan Perez</td>
+                                    <td class="text-center fw-bold text-primary fs-5" th:text="${calificacion.nota}">4.5
+                                    </td>
+                                </tr>
+                                <tr th:if="${calificaciones.empty}">
+                                    <td colspan="3" class="text-center text-muted fst-italic py-3">Sin valoraciones
+                                        académicas emitidas en esta clase.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

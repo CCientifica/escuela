@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Alumnos - Admin</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: #1e293b;
+            color: white;
+            position: fixed;
+            width: 250px;
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #3b82f6;
+            color: white;
+            font-weight: bold;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="p-4 text-center border-bottom border-secondary mb-3">
+            <i class="fa-solid fa-shield-halved fs-1 mb-2 text-warning"></i>
+            <h5 class="mb-0">Administración</h5>
+        </div>
+        <a th:href="@{/panel/admin/estudiantes}" class="active"><i class="fa-solid fa-users me-2"></i> Alumnos</a>
+        <a th:href="@{/panel/admin/instructores}"><i class="fa-solid fa-chalkboard-user me-2"></i> Instructores</a>
+        <a th:href="@{/panel/admin/clases}"><i class="fa-solid fa-layer-group me-2"></i> Clases y Zonas</a>
+        <a th:href="@{/panel/admin/pagos}"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Pagos</a>
+        <a th:href="@{/panel/admin/pqrs}"><i class="fa-solid fa-envelope-open-text me-2"></i> PQRS y Contacto</a>
+        <a th:href="@{/logout}" class="text-danger mt-5"><i class="fa-solid fa-right-from-bracket me-2"></i> Cerrar
+            Sesión</a>
+    </div>
+
+    <div class="main-content">
+        <h2 class="mb-4 fw-bold">Listado Integral de Estudiantes</h2>
+
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i><span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="table-card">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-graduate text-primary me-2"></i>Estudiantes
+                    Matriculados</h5>
+                <a th:href="@{/registro/estudiantes}" class="btn btn-sm btn-outline-primary"><i
+                        class="fa-solid fa-user-plus me-1"></i>Nuevo Estudiante</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Documento</th>
+                            <th>Nombre Completo</th>
+                            <th>Nivel / Patín</th>
+                            <th>Contacto</th>
+                            <th>Acceso Plataforma</th>
+                            <th class="text-center">Historial</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="estudiante : ${estudiantes}">
+                            <td class="fw-semibold" th:text="${estudiante.documentoIdentidad}">ID</td>
+                            <td th:text="${estudiante.nombreCompleto}">Nombre</td>
+                            <td>
+                                <span class="badge bg-secondary" th:text="${estudiante.nivel}">Nivel</span>
+                            </td>
+                            <td>
+                                <small class="d-block text-muted"
+                                    th:text="${estudiante.correoElectronico}">correo@ejemplo.com</small>
+                                <small class="d-block text-muted" th:text="${estudiante.telefono}">Tel</small>
+                            </td>
+                            <td>
+                                <span th:if="${estudiante.usuario != null and estudiante.usuario.activo}"
+                                    class="badge bg-success"><i class="fa-solid fa-check me-1"></i>Logueable</span>
+                                <span th:if="${estudiante.usuario != null and !estudiante.usuario.activo}"
+                                    class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i>Restringido</span>
+                                <!-- Action to Suspend right from here -->
+                                <form th:if="${estudiante.usuario != null and estudiante.usuario.activo}"
+                                    th:action="@{/panel/admin/estudiantes/{id}/suspender(id=${estudiante.id})}"
+                                    method="post" class="d-inline ms-2">
+                                    <button type="submit"
+                                        class="btn btn-sm btn-outline-danger shadow-sm border-0 px-2 py-0"
+                                        title="Dar de baja de la academia">
+                                        <i class="fa-solid fa-user-xmark fs-5"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                <a th:href="@{/panel/admin/estudiantes/{id}(id=${estudiante.id})}"
+                                    class="btn btn-sm btn-info text-white shadow-sm" title="Ver Historial y Pagos">
+                                    <i class="fa-solid fa-eye me-1"></i>Detalles
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${estudiantes.empty}">
+                            <td colspan="6" class="text-center text-muted py-4">No hay estudiantes registrados aún.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
