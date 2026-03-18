@@ -4,9 +4,11 @@ import com.example.demo.model.Estudiante;
 import com.example.demo.model.Pago;
 import com.example.demo.repository.EstudianteRepository;
 import com.example.demo.repository.PagoRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -27,31 +29,23 @@ public class PagoController {
     @GetMapping
     public String listarPagos(Model model) {
         List<Pago> pagos = pagoRepository.findAll();
-        // List<Estudiante> estudiantes = estudianteRepository.findAll(); // This line
-        // is no longer needed for the modal
-
         model.addAttribute("pagos", pagos);
-        // Los estudiantes ya no se necesitan para el modal porque es read-only la vista
         model.addAttribute("nuevoPago", new Pago());
-
         return "pagos/list";
     }
 
-    // --- NUEVO FLUJO DE CHECKOUT ---
     @GetMapping("/checkout/{estudianteId}")
     public String mostrarCheckout(@PathVariable Long estudianteId, Model model, RedirectAttributes redirectAttributes) {
-
         Optional<Estudiante> estudianteOpt = estudianteRepository.findById(estudianteId);
 
         if (estudianteOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("mensajeError", "El estudiante especificado no existe para cobro.");
-            return "redirect:/estudiantes";
+            return "redirect:/login";
         }
 
         Pago nuevoPago = new Pago();
         nuevoPago.setEstudiante(estudianteOpt.get());
 
-        // Si viene un metodoPago de la redirección del registro, lo preseleccionamos
         if (model.containsAttribute("metodoPago")) {
             nuevoPago.setMetodoPago((String) model.getAttribute("metodoPago"));
         }
@@ -63,23 +57,30 @@ public class PagoController {
     }
 
     @PostMapping("/checkout/procesar")
-    public String procesarCheckout(@ModelAttribute("pago") Pago pago,
+    public String procesarCheckout(@Valid @ModelAttribute("pago") Pago pago,
+            BindingResult bindingResult,
             @RequestParam("estudianteId") Long estudianteId,
+            Model model,
             RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            Estudiante estudiante = estudianteRepository.findById(estudianteId).orElse(null);
+            model.addAttribute("estudiante", estudiante);
+            return "pagos/checkout";
+        }
+
         try {
             Estudiante estudiante = estudianteRepository.findById(estudianteId)
                     .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"));
 
             pago.setEstudiante(estudiante);
 
-            // Si no se envía fecha, usar la de hoy
             if (pago.getFechaPago() == null) {
                 pago.setFechaPago(LocalDate.now());
             }
 
             pagoRepository.save(pago);
 
-            // Actualizar estado general del estudiante si el pago impacta su cartera
             if ("PAZ_Y_SALVO".equals(pago.getEstado()) || "Pagado".equals(pago.getEstado())) {
                 estudiante.setEstadoPago("Al día");
                 estudianteRepository.save(estudiante);
@@ -92,8 +93,10 @@ public class PagoController {
                     + estudiante.getNombreCompleto() + " fue recibido correctamente.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError", "Error al registrar el pago: " + e.getMessage());
+            return "redirect:/pagos/checkout/" + estudianteId;
         }
 
-        return "redirect:/estudiantes"; // Tras cobrar redirige a la lista activa general
+        return "redirect:/login?registered=true";
     }
 }
+

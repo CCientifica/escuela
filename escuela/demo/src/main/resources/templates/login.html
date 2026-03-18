@@ -176,6 +176,13 @@
                 <div th:text="${error}"></div>
             </div>
 
+            <!-- Alerta Registro Exitoso -->
+            <div th:if="${param.registered}"
+                class="alert alert-success bg-success text-white border-0 rounded-4 p-3 mb-4 d-flex align-items-center">
+                <i class="fa-solid fa-circle-check fs-5 me-3"></i>
+                <div>¡Registro y pago inicial completados con éxito! Ya puedes iniciar sesión.</div>
+            </div>
+
             <!-- Alerta Logout -->
             <div th:if="${param.logout}"
                 class="alert alert-success bg-success text-white border-0 rounded-4 p-3 mb-4 d-flex align-items-center">

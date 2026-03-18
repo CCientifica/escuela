@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -20,12 +21,16 @@ public class Estudiante {
     private Long id;
 
     @Column(name = "nombre_completo", nullable = false)
+    @NotBlank(message = "El nombre completo es obligatorio")
     private String nombreCompleto;
 
     @Column(name = "documento_identidad", nullable = false, unique = true)
+    @NotBlank(message = "El documento de identidad es obligatorio")
     private String documentoIdentidad;
 
     @Column(name = "correo_electronico", unique = true)
+    @NotBlank(message = "El correo electrónico es obligatorio")
+    @Email(message = "Debe ser un correo electrónico válido")
     private String correoElectronico;
 
     @Column(name = "fecha_nacimiento")
@@ -39,11 +44,13 @@ public class Estudiante {
     private String telefono;
 
     @Column(nullable = false)
+    @NotBlank(message = "El nivel es obligatorio")
     private String nivel; // Básico, Intermedio, Avanzado
 
     private String eps;
 
     @Column(name = "contacto_emergencia", nullable = false)
+    @NotBlank(message = "El contacto de emergencia es obligatorio")
     private String contactoEmergencia;
 
     @Column(name = "estado_pago", nullable = false)

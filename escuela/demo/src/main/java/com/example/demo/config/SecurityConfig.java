@@ -12,48 +12,50 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                http
-                                .csrf(csrf -> csrf.disable())
-                                .authorizeHttpRequests(authz -> authz
-                                                // Static resources and public endpoints
-                                                .requestMatchers("/", "/index", "/login", "/registro/**",
-                                                                "/corporativo", "/servicios-eventos",
-                                                                "/clases-publicas")
-                                                .permitAll()
-                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**")
-                                                .permitAll()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // CSRF is enabled by default in Spring Security 6.
+                // We keep it enabled for better security on forms.
+                .authorizeHttpRequests(authz -> authz
+                        // Static resources and public endpoints
+                        .requestMatchers("/", "/index", "/login", "/registro/**",
+                                "/corporativo", "/servicios-eventos",
+                                "/clases-publicas", "/pagos/checkout/**")
+                        .permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**")
+                        .permitAll()
 
-                                                // Role based access
-                                                .requestMatchers("/panel/admin/**", "/pagos/**", "/estudiantes/**",
-                                                                "/horarios/**")
-                                                .hasRole("ADMIN")
-                                                .requestMatchers("/panel/estudiante/**")
-                                                .hasAnyRole("ESTUDIANTE", "ADMIN")
-                                                .requestMatchers("/panel/instructor/**")
-                                                .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        // Role based access
+                        .requestMatchers("/panel/admin/**", "/pagos/**", "/estudiantes/**",
+                                "/horarios/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers("/panel/estudiante/**")
+                        .hasAnyRole("ESTUDIANTE", "ADMIN")
+                        .requestMatchers("/panel/instructor/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
 
-                                                // Everything else requires authentication
-                                                .anyRequest().authenticated())
-                                .formLogin(form -> form
-                                                .loginPage("/login")
-                                                .loginProcessingUrl("/login")
-                                                .usernameParameter("email")
-                                                .passwordParameter("password")
-                                                .defaultSuccessUrl("/login/success", true)
-                                                .failureUrl("/login?error=true")
-                                                .permitAll())
-                                .logout(logout -> logout
-                                                .logoutUrl("/logout")
-                                                .logoutSuccessUrl("/login?logout=true")
-                                                .permitAll());
+                        // Everything else requires authentication
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/login/success", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .permitAll());
 
-                return http.build();
-        }
+        return http.build();
+    }
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder();
-        }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
+

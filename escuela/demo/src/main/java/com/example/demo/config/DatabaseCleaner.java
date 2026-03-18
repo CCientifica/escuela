@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -11,8 +12,14 @@ public class DatabaseCleaner implements CommandLineRunner {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Value("${app.db.cleaner.enabled:false}")
+    private boolean cleanerEnabled;
+
     @Override
     public void run(String... args) throws Exception {
+        if (!cleanerEnabled) {
+            return;
+        }
         try {
             System.out.println("Validando y limpiando esquema de base de datos de columnas antiguas...");
             // Intentar eliminar las columnas 'email' y 'password' si existen en estudiantes

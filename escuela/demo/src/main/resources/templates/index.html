@@ -215,10 +215,10 @@
                             Registro
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarRegistro">
-                            <li><a class="dropdown-item" href="/registro/estudiantes">Inscripción de Estudiantes</a>
+                            <li><a class="dropdown-item" th:href="@{/registro/estudiantes}">Inscripción de Estudiantes</a>
                             </li>
-                            <li><a class="dropdown-item" href="/registro/instructor">Inscripción de Instructor</a></li>
-                            <li><a class="dropdown-item" href="/registro/clases">Clases</a></li>
+                            <li><a class="dropdown-item" th:href="@{/registro/instructor}">Inscripción de Instructor</a></li>
+                            <li><a class="dropdown-item" th:href="@{/clases-publicas}">Clases</a></li>
                         </ul>
                     </li>
 
@@ -573,7 +573,7 @@
                                 contactaremos en breve.</p>
                         </div>
 
-                        <form action="/contacto" method="POST" class="bg-white rounded-4 p-4 p-md-5 text-dark shadow">
+                        <form th:action="@{/contacto}" method="POST" class="bg-white rounded-4 p-4 p-md-5 text-dark shadow">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Nombre Completo</label>

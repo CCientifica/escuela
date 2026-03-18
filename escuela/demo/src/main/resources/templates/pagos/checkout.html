@@ -165,14 +165,16 @@
                                 <option value="Mensualidad">Mensualidad</option>
                                 <option value="Kit de uniforme">Kit de uniforme</option>
                             </select>
+                            <div th:if="${#fields.hasErrors('concepto')}" th:errors="*{concepto}" class="text-danger small">Error en concepto</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Monto ($) <span class="text-danger">*</span></label>
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text bg-light border-0 fw-bold text-success">$</span>
                                 <input type="number" class="form-control bg-light border-0" th:field="*{monto}"
-                                    min="1000" step="500" required placeholder="Ej. 120000">
+                                    min="0" step="0.01" required placeholder="Ej. 120000.00">
                             </div>
+                            <div th:if="${#fields.hasErrors('monto')}" th:errors="*{monto}" class="text-danger small">Error en monto</div>
                         </div>
                     </div>
 
