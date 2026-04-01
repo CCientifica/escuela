@@ -1,18 +1,14 @@
 package com.example.demo.config;
 
-import com.example.demo.model.Estudiante;
-import com.example.demo.model.Instructor;
-import com.example.demo.model.Usuario;
-import com.example.demo.repository.EstudianteRepository;
-import com.example.demo.repository.InstructorRepository;
-import com.example.demo.repository.UsuarioRepository;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
+import java.time.LocalDate;
 
 @Configuration
 public class DataSeeder {
@@ -24,10 +20,15 @@ public class DataSeeder {
     private String adminPassword;
 
     @Bean
-    public CommandLineRunner initData(UsuarioRepository usuarioRepository, 
-                                    EstudianteRepository estudianteRepository,
-                                    InstructorRepository instructorRepository,
-                                    PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(
+            UsuarioRepository usuarioRepository,
+            EstudianteRepository estudianteRepository,
+            InstructorRepository instructorRepository,
+            NoticiaRepository noticiaRepository,
+            TestimonioRepository testimonioRepository,
+            EventoRepository eventoRepository,
+            PasswordEncoder passwordEncoder) {
+
         return args -> {
             if (!seedingEnabled) {
                 return;
@@ -35,7 +36,10 @@ public class DataSeeder {
 
             String testPassword = passwordEncoder.encode("123456");
 
-            // 1. ADMIN PRUEBA
+            // =============================================
+            // 1. USUARIOS DE PRUEBA
+            // =============================================
+
             String emailAdmin = "adminprueba@test.com";
             if (usuarioRepository.findByEmail(emailAdmin).isEmpty()) {
                 Usuario admin = new Usuario();
@@ -44,10 +48,9 @@ public class DataSeeder {
                 admin.setRol("ADMIN");
                 admin.setActivo(true);
                 usuarioRepository.save(admin);
-                System.out.println("✅ Usuario ADMIN de prueba creado: " + emailAdmin);
+                System.out.println("✅ Usuario ADMIN creado: " + emailAdmin);
             }
 
-            // 2. INSTRUCTOR PRUEBA
             String emailInst = "instructorprueba@test.com";
             if (usuarioRepository.findByEmail(emailInst).isEmpty()) {
                 Usuario userInst = new Usuario();
@@ -55,17 +58,15 @@ public class DataSeeder {
                 userInst.setPassword(testPassword);
                 userInst.setRol("INSTRUCTOR");
                 userInst.setActivo(true);
-
                 Instructor inst = new Instructor();
                 inst.setNombre("Instructor Uno");
                 inst.setCorreoElectronico(emailInst);
                 inst.setEspecialidad("Velocidad");
                 inst.setUsuario(userInst);
                 instructorRepository.save(inst);
-                System.out.println("✅ Usuario INSTRUCTOR de prueba creado: " + emailInst);
+                System.out.println("✅ Usuario INSTRUCTOR creado: " + emailInst);
             }
 
-            // 3. ESTUDIANTE PRUEBA
             String emailEstv = "estudianteprueba@test.com";
             if (usuarioRepository.findByEmail(emailEstv).isEmpty()) {
                 Usuario userEst = new Usuario();
@@ -73,7 +74,6 @@ public class DataSeeder {
                 userEst.setPassword(testPassword);
                 userEst.setRol("ESTUDIANTE");
                 userEst.setActivo(true);
-
                 Estudiante est = new Estudiante();
                 est.setNombreCompleto("Estudiante Uno");
                 est.setDocumentoIdentidad("TEST123456");
@@ -82,10 +82,9 @@ public class DataSeeder {
                 est.setContactoEmergencia("123456789");
                 est.setUsuario(userEst);
                 estudianteRepository.save(est);
-                System.out.println("✅ Usuario ESTUDIANTE de prueba creado: " + emailEstv);
+                System.out.println("✅ Usuario ESTUDIANTE creado: " + emailEstv);
             }
 
-            // Centralized Legacy Admin (If needed)
             String emailLegacyAdmin = "admin@rollerspeed.com";
             if (usuarioRepository.findByEmail(emailLegacyAdmin).isEmpty()) {
                 Usuario admin = new Usuario();
@@ -95,6 +94,60 @@ public class DataSeeder {
                 admin.setActivo(true);
                 usuarioRepository.save(admin);
                 System.out.println("✅ Admin principal creado: " + emailLegacyAdmin);
+            }
+
+            // =============================================
+            // 2. CONTENIDO DE PORTAL (ANTES ESTÁTICO EN HTML)
+            // =============================================
+
+            // Noticias
+            if (noticiaRepository.count() == 0) {
+                Noticia n1 = new Noticia();
+                n1.setTitulo("¡Brillamos en el Patinódromo de la Alegría!");
+                n1.setContenido("Nuestros patinadores de niveles Intermedio y Avanzado completaron con éxito el primer chequeo técnico del trimestre. Felicitamos a todos por mejorar sus tiempos de reacción y técnica de curva.");
+                n1.setCategoria("Entrenamientos");
+                n1.setFechaPublicacion(LocalDate.now());
+                noticiaRepository.save(n1);
+
+                Noticia n2 = new Noticia();
+                n2.setTitulo("Rumbo al Festival Nacional de Escuelas");
+                n2.setContenido("Nos preparamos para representar a Santa Marta en el próximo evento organizado por Fedepatín. Estamos ajustando los planes formativos para llegar en nuestra mejor versión.");
+                n2.setCategoria("Competencias");
+                n2.setFechaPublicacion(LocalDate.now());
+                noticiaRepository.save(n2);
+
+                System.out.println("✅ Noticias de portal cargadas.");
+            }
+
+            // Testimonios
+            if (testimonioRepository.count() == 0) {
+                testimonioRepository.save(new Testimonio(null, "María C.", "Madre de Familia",
+                        "La disciplina y el amor con el que enseñan a los niños es increíble. Mi hija ha mejorado no solo en patinaje sino en su confianza personal.", 5));
+
+                testimonioRepository.save(new Testimonio(null, "Andrés S.", "Alumno Nivel Avanzado",
+                        "Entrenar con instructores certificados me ha permitido alcanzar el nivel competitivo que buscaba para mi categoría juvenil.", 5));
+
+                testimonioRepository.save(new Testimonio(null, "Carlos P.", "Alumno Adulto Principiante",
+                        "Un espacio súper seguro. Empecé de cero siendo adulto y ahora no falto a ninguna clase. ¡Gran equipo!", 4));
+
+                System.out.println("✅ Testimonios de portal cargados.");
+            }
+
+            // Eventos
+            if (eventoRepository.count() == 0) {
+                eventoRepository.save(new Evento(null, "1° Festival de Escuelas Roller Speed",
+                        LocalDate.of(2026, 4, 15), "Polideportivo Santa Marta",
+                        "Jornada de integración para todos los niveles y entrega de insignias de progreso. (Evento Interno)."));
+
+                eventoRepository.save(new Evento(null, "Santa Marta Night Run 2026",
+                        LocalDate.of(2026, 3, 29), "Santa Marta",
+                        "Acompañaremos en los puntos de hidratación apoyando la cultura deportiva de la ciudad."));
+
+                eventoRepository.save(new Evento(null, "Parada Nacional Interclubes",
+                        LocalDate.of(2026, 3, 20), "Buga, Valle",
+                        "Seguimiento Nacional analizando técnicas para nuestras clases Élite."));
+
+                System.out.println("✅ Eventos de portal cargados.");
             }
         };
     }

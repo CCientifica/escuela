@@ -405,28 +405,14 @@
                 </div>
 
                 <div class="row g-4">
-                    <!-- Noticia 1 -->
-                    <div class="col-md-6">
+                    <div class="col-md-6" th:each="noticia, iterStat : ${noticias}">
                         <div class="card h-100 border-0 shadow-sm rounded-4 module-card">
                             <div class="card-body p-4">
-                                <span class="badge bg-primary mb-2">Entrenamientos</span>
-                                <h4 class="fw-bold card-title">¡Brillamos en el Patinódromo de la Alegría!</h4>
-                                <p class="card-text">Nuestros patinadores de niveles Intermedio y Avanzado completaron
-                                    con éxito el primer chequeo técnico del trimestre. Felicitamos a todos por mejorar
-                                    sus tiempos de reacción y técnica de curva.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Noticia 2 -->
-                    <div class="col-md-6">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 module-card">
-                            <div class="card-body p-4">
-                                <span class="badge bg-success mb-2">Competencias</span>
-                                <h4 class="fw-bold card-title">Rumbo al Festival Nacional de Escuelas</h4>
-                                <p class="card-text">Nos preparamos para representar a Santa Marta en el próximo evento
-                                    organizado por Fedepatín. Estamos ajustando los planes formativos para llegar en
-                                    nuestra mejor versión.</p>
+                                <span class="badge mb-2" 
+                                      th:classappend="${iterStat.odd ? 'bg-primary' : 'bg-success'}" 
+                                      th:text="${noticia.categoria}">Categoría</span>
+                                <h4 class="fw-bold card-title" th:text="${noticia.titulo}">Título</h4>
+                                <p class="card-text" th:text="${noticia.contenido}">Contenido de la noticia.</p>
                             </div>
                         </div>
                     </div>
@@ -437,31 +423,17 @@
                         class="fa-regular fa-calendar-check text-primary me-2"></i> Próximos Eventos: ¡Agenda tu Pasión!
                 </h4>
                 <div class="row g-4 justify-content-center">
-                    <div class="col-lg-4 col-md-6">
-                        <div class="p-3 border rounded-3 bg-white h-100 border-start border-primary border-4 shadow-sm">
-                            <h6 class="fw-bold text-primary mb-1">1° Festival de Escuelas Roller Speed</h6>
-                            <p class="small text-muted mb-2"><i class="fa-solid fa-location-dot me-1"></i> Polideportivo
-                                Santa Marta</p>
-                            <p class="small mb-0">Jornada de integración para todos los niveles y entrega de insignias
-                                de progreso. (Evento Interno).</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="p-3 border rounded-3 bg-white h-100 border-start border-success border-4 shadow-sm">
-                            <h6 class="fw-bold text-success mb-1">Santa Marta Night Run 2026</h6>
-                            <p class="small text-muted mb-2"><i class="fa-solid fa-calendar me-1"></i> 29 de Marzo de
-                                2026</p>
-                            <p class="small mb-0">Acompañaremos en los puntos de hidratación apoyando la cultura
-                                deportiva de la ciudad.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="p-3 border rounded-3 bg-white h-100 border-start border-warning border-4 shadow-sm">
-                            <h6 class="fw-bold text-warning mb-1">Parada Nacional Interclubes</h6>
-                            <p class="small text-muted mb-2"><i class="fa-solid fa-calendar me-1"></i> 20 - 23 de Marzo
-                                de 2026</p>
-                            <p class="small mb-0">Seguimiento Nacional en Buga, Valle, analizando técnicas para nuestras
-                                clases Élite.</p>
+                    <div class="col-lg-4 col-md-6" th:each="evento, iterStat : ${eventos}">
+                        <div class="p-3 border rounded-3 bg-white h-100 border-start border-4 shadow-sm"
+                             th:classappend="${iterStat.index % 3 == 0 ? 'border-primary' : (iterStat.index % 3 == 1 ? 'border-success' : 'border-warning')}">
+                            <h6 class="fw-bold mb-1" 
+                                th:classappend="${iterStat.index % 3 == 0 ? 'text-primary' : (iterStat.index % 3 == 1 ? 'text-success' : 'text-warning')}" 
+                                th:text="${evento.nombreEvento}">Nombre del Evento</h6>
+                            <p class="small text-muted mb-2">
+                                <i class="fa-solid fa-location-dot me-1"></i> 
+                                <span th:text="${evento.ubicacion} + ' - ' + ${evento.fechaEvento}">Ubicación y Fecha</span>
+                            </p>
+                            <p class="small mb-0" th:text="${evento.descripcion}">Descripción del evento.</p>
                         </div>
                     </div>
                 </div>
@@ -473,48 +445,75 @@
             <div class="text-center mb-5">
                 <h2 class="fw-bold fs-1 text-dark">Lo que dice nuestra <span class="text-primary">Comunidad</span></h2>
             </div>
-            <div class="row g-4">
-                <div class="col-md-4">
+            <div class="row g-4 mb-5">
+                <div class="col-md-4" th:each="testimonio, iterStat : ${testimonios}">
                     <div class="card bg-white border-0 shadow-sm p-4 h-100 rounded-4"
-                        style="border-top: 4px solid #3b82f6 !important;">
+                         th:style="'border-top: 4px solid ' + ${iterStat.index % 3 == 0 ? '#3b82f6' : (iterStat.index % 3 == 1 ? '#10b981' : '#f59e0b')} + ' !important;'">
                         <div class="text-warning mb-3">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i>
+                            <!-- Loop para mostrar estrellas llenas -->
+                            <i class="fa-solid fa-star" th:each="i : ${#numbers.sequence(1, testimonio.estrellas ?: 1)}"></i>
+                            <!-- Loop para mostrar estrellas vacías si las hay -->
+                            <i class="fa-regular fa-star" th:if="${(testimonio.estrellas ?: 0) < 5}" th:each="i : ${#numbers.sequence((testimonio.estrellas ?: 0) + 1, 5)}"></i>
                         </div>
-                        <p class="fst-italic text-secondary mb-4">"La disciplina y el amor con el que enseñan a los
-                            niños es increíble. Mi hija ha mejorado no solo en patinaje sino en su confianza personal."
-                        </p>
-                        <h6 class="fw-bold mb-0 text-dark">María C.</h6>
-                        <small class="text-muted">Madre de Familia</small>
+                        <p class="fst-italic text-secondary mb-4" th:text="'&quot;' + ${testimonio.contenido} + '&quot;'">"Mensaje"</p>
+                        <h6 class="fw-bold mb-0 text-dark" th:text="${testimonio.autor}">Autor</h6>
+                        <small class="text-muted" th:text="${testimonio.rolAutor}">Rol</small>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card bg-white border-0 shadow-sm p-4 h-100 rounded-4"
-                        style="border-top: 4px solid #10b981 !important;">
-                        <div class="text-warning mb-3">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i>
+            </div>
+
+            <!-- Formulario para dejar testimonio -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-10">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                        <div class="text-center mb-4">
+                            <h4 class="fw-bold text-dark">¡Cuéntanos tu experiencia! <i class="fa-solid fa-heart text-danger ms-1"></i></h4>
+                            <p class="text-muted">Tu opinión es muy importante para nosotros y para futuros patinadores.</p>
                         </div>
-                        <p class="fst-italic text-secondary mb-4">"Entrenar con instructores certificados me ha
-                            permitido alcanzar el nivel competitivo que buscaba para mi categoría juvenil."</p>
-                        <h6 class="fw-bold mb-0 text-dark">Andrés S.</h6>
-                        <small class="text-muted">Alumno Nivel Avanzado</small>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-white border-0 shadow-sm p-4 h-100 rounded-4"
-                        style="border-top: 4px solid #f59e0b !important;">
-                        <div class="text-warning mb-3">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-regular fa-star"></i>
-                        </div>
-                        <p class="fst-italic text-secondary mb-4">"Un espacio súper seguro. Empecé de cero siendo adulto
-                            y ahora no falto a ninguna clase. ¡Gran equipo!"</p>
-                        <h6 class="fw-bold mb-0 text-dark">Carlos P.</h6>
-                        <small class="text-muted">Alumno Adulto Principiante</small>
+                        <form th:action="@{/testimonio/nuevo}" method="POST">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Tu Nombre</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0"><i class="fa-solid fa-user text-primary"></i></span>
+                                        <input type="text" name="autor" class="form-control bg-light border-0" placeholder="Ej. Ana García" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">¿Quién eres?</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0"><i class="fa-solid fa-id-card text-primary"></i></span>
+                                        <input type="text" name="rolAutor" class="form-control bg-light border-0" placeholder="Ej. Madre de Familia" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Calificación</label>
+                                    <div class="d-flex align-items-center gap-3 bg-light p-2 rounded">
+                                        <div class="form-check form-check-inline m-0">
+                                            <input class="form-check-input" type="radio" name="estrellas" value="5" id="star5" checked>
+                                            <label class="form-check-label text-warning" for="star5">5 <i class="fa-solid fa-star"></i></label>
+                                        </div>
+                                        <div class="form-check form-check-inline m-0">
+                                            <input class="form-check-input" type="radio" name="estrellas" value="4" id="star4">
+                                            <label class="form-check-label text-warning" for="star4">4 <i class="fa-solid fa-star"></i></label>
+                                        </div>
+                                        <div class="form-check form-check-inline m-0">
+                                            <input class="form-check-input" type="radio" name="estrellas" value="3" id="star3">
+                                            <label class="form-check-label text-warning" for="star3">3 <i class="fa-solid fa-star"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Tu Mensaje</label>
+                                    <textarea name="contenido" class="form-control bg-light border-0" rows="3" placeholder="Comparte cómo ha sido tu experiencia con nosotros..." required></textarea>
+                                </div>
+                                <div class="col-12 text-center mt-4">
+                                    <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+                                        Publicar Testimonio <i class="fa-solid fa-paper-plane ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
