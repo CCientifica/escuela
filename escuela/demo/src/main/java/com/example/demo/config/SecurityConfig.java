@@ -21,7 +21,8 @@ public class SecurityConfig {
                         // Static resources and public endpoints
                         .requestMatchers("/", "/index", "/login", "/registro/**",
                                 "/corporativo", "/servicios-eventos",
-                                "/clases-publicas", "/pagos/checkout/**")
+                                "/clases-publicas", "/pagos/checkout/**",
+                                "/contacto", "/testimonio/nuevo")
                         .permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**")
                         .permitAll()

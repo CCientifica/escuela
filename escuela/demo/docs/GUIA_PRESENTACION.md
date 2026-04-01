@@ -1,42 +1,50 @@
-# 🎓 Guía de Presentación: Código Academia Roller Speed
+# Guía Maestra de Presentación: Arquitectura y Clases
 
-Esta guía te servirá paso a paso para presentar el proyecto ante tu profesor. Está diseñada para resaltar la calidad técnica y la solidez de la arquitectura de clases.
-
----
-
-## 🕒 1. Introducción (Visión General)
-*   **Qué decir:** "Este es el sistema de gestión para la **Academia Roller Speed**. El objetivo es centralizar la administración académica, financiera y la comunicación institucional en una sola plataforma robusta basada en Spring Boot."
-*   **Qué mostrar:** Abre el navegador en `localhost:8080/index` y muestra las noticias, testimonios y la agenda de eventos. Menciona: *"Ahora todo este contenido es dinámico, gestionado desde la base de datos PostgreSQL."*
+Esta guía es tu herramienta estratégica para demostrar un dominio total sobre la **ingeniería de software** aplicada en este proyecto. El objetivo es que el profesor vea que no solo "funciona", sino que está **diseñado** bajo estándares industriales.
 
 ---
 
-## 🏛️ 2. Arquitectura de Clases (El punto fuerte)
-*   **Qué decir:** "Diseñamos el sistema bajo una **arquitectura por capas** (N-Tier Architecture), lo cual garantiza la separación de responsabilidades y facilita el mantenimiento."
-*   **Archivos a mostrar:**
-    1.  **Paquete `model`:** Abre `Estudiante.java` o `Noticia.java`. Explica: *"Usamos Entidades JPA para mapear los objetos Java directamente a PostgreSQL mediante Hibernate."*
-    2.  **Paquete `repository`:** Abre `NoticiaRepository.java`. Explica: *"Aprovechamos Spring Data JPA para las operaciones CRUD automáticas, evitando escribir SQL manual y reduciendo errores."*
-    3.  **Paquete `service`:** Abre `EscuelaService.java`. Explica: *"Aquí reside la lógica de negocio, manteniendo a los controladores delgados y enfocados únicamente en el flujo de la web."*
-    4.  **Paquete `controller`:** Abre `IndexController.java`. Explica: *"Como es una arquitectura MVC, los controladores inyectan los datos en vistas de Thymeleaf para renderizar contenido en tiempo real."*
+## 🏗️ 1. Pilar Arquitectónico: N-Tier (Arquitectura por Capas)
+*   **Qué decir:** "Nuestra aplicación no es un monolito desordenado. Implementamos una **Arquitectura N-Tier** para garantizar la separación de intereses (Separation of Concerns)."
+*   **Detalle Técnico:**
+    *   **Capa de Presentación (Controller):** "Manejamos el flujo **MVC**. El controlador desacopla la petición HTTP del procesamiento de datos."
+    *   **Capa de Negocio (Service):** "Aquí reside la inteligencia. Los servicios actúan como una **fachada (Facade)** que protege la integridad de los procesos académicos."
+    *   **Capa de Persistencia (Repository):** "Implementamos el **Patrón Repository**. Gracias a Spring Data JPA, las operaciones de base de datos son agnósticas al motor usado (PostgreSQL)."
 
 ---
 
-## 🛡️ 3. Seguridad y Roles (BCrypt y RBAC)
-*   **Qué decir:** "Implementamos seguridad basada en roles (RBAC) mediante **Spring Security**."
-*   **Archivo a mostrar:** `SecurityConfig.java`. Explica: *"Definimos reglas claras: solo el ADMIN puede gestionar pagos, mientras que los instructores solo ven sus clases. Además, todas las contraseñas se almacenan con el algoritmo de hash BCrypt."*
+## 🧩 2. Patrones de Diseño Implementados
+*   **Inyección de Dependencias (DI):** "Usamos `@Autowired` para aplicar el principio de **Inversión de Control (IoC)**. Esto permite que el sistema sea modular; las clases no crean sus dependencias, las reciben."
+*   **Data Transfer Object (DTO):** "En los formularios de contacto y testimonios, usamos objetos de transferencia para mover datos de la vista al controlador de forma segura."
+*   **Singleton:** "Spring gestiona nuestras clases de servicio y repositorio como **Beans Singleton**, optimizando drásticamente el uso de memoria RAM."
+*   **Proxy Pattern:** "Cuando usamos `@Transactional` en los servicios, Spring crea un proxy que gestiona automáticamente el inicio y fin de la transacción en PostgreSQL."
 
 ---
 
-## 🏗️ 4. Principios SOLID aplicados
-Si el profesor pregunta por la arquitectura de las clases, usa estas frases:
-*   **Single Responsibility Principle (SRP):** "Cada clase tiene un solo propósito. El controlador no sabe cómo se guarda el dato, solo cómo recibirlo."
-*   **Dependency Injection (DI):** "Usamos inyección de dependencias (`@Autowired`) para desacoplar las clases y facilitar las pruebas unitarias."
+## 🏛️ 3. Jerarquía y Estructura de Clases
+*   **Entidades (Modelos):** Abre `Estudiante.java` o `Noticia.java`.
+    *   *Explicación:* "Nuestras clases son **Entidades JPA**. Noten el uso de anotaciones como `@Column(nullable = false)` y `@Enumerated`. Esto define el esquema de la base de datos directamente desde el código Java, siguiendo la filosofía **Code-First**."
+*   **Interfaces (Repositorios):** Abre `NoticiaRepository.java`.
+    *   *Explicación:* "Observen que es una interfaz que extiende `JpaRepository`. No escribimos el código SQL; Spring lo genera en tiempo de ejecución. Esto garantiza que el código sea limpio y libre de errores de sintaxis manual."
 
 ---
 
-## 💡 5. Conclusión y Estrategia de Datos
-*   **Qué decir:** "Actualmente el sistema está en fase **Demo Funcional**. Usamos un `DataSeeder` para poblar la base de datos automáticamente con escenarios reales para esta presentación, pero el esquema ya está 100% preparado para escalar a una producción total."
+## 🛡️ 4. Seguridad a Nivel de Clase (Spring Security)
+*   **RBAC (Role-Based Access Control):** "La seguridad está inyectada en el middleware. Usamos un **SecurityFilterChain** para definir qué roles pueden acceder a qué clases de controlador. Esto protege los métodos de administración de accesos no autorizados."
+*   **Hashing:** "Las contraseñas no existen en nuestra DB. Usamos el algoritmo **BCrypt** (Fuerza 10) para generar un hash irreversible, cumpliendo con estándares de protección de datos."
+
+---
+
+## 💹 5. Principios SOLID en Acción
+*   **SRP (Responsabilidad Única):** "Si queremos cambiar cómo se guardan los datos, solo tocamos el Repositorio. Si queremos cambiar el diseño, solo tocamos el HTML. Las clases nunca están mezcladas."
+*   **LSP (Sustitución de Liskov):** "Nuestras interfaces de repositorio pueden ser sustituidas por cualquier implementación de Spring Data sin romper la aplicación."
+
+---
+
+## 🏆 Conclusión para el Cierre
+*   **Frase Final:** "Profesor, el diseño de estas clases permite que el sistema sea **escalable** y **testeable**. Gracias a la inyección de dependencias, podríamos integrar pruebas unitarias con JUnit de manera natural. El sistema está listo para producción en la nube (Render)."
 
 ---
 
 > [!TIP]
-> Recuerda que tienes el documento de **[CODIGO_Y_CLASES.md](./CODIGO_Y_CLASES.md)** por si el profesor desea entrar en detalles más técnicos sobre un diagrama específico. ¡Mucho éxito!
+> **Consejo de Oro:** Cuando el profesor te pida ver un archivo, ábrelo y señala las **anotaciones** (`@Service`, `@Repository`, `@Entity`). Explica que esas anotaciones son las que le dan "superpoderes" a las clases normales de Java mediante la **Anotación-Driven Configuration** de Spring.

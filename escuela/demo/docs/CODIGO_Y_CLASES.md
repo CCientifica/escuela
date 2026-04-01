@@ -1,42 +1,56 @@
-# 🏗️ Arquitectura de Código y Clases Java
+# 🏗️ Deep-Dive: Arquitectura de Clases y Código Java
 
-Este documento detalla la estructura técnica del proyecto **Academia Roller Speed**, diseñada bajo estándares profesionales de desarrollo con **Spring Boot**.
-
----
-
-## 🏛️ 1. Estructura de Paquetes (Arquitectura N-Tier)
-Hemos separado las responsabilidades del sistema en un modelo de **4 capas**, lo que garantiza la mantenibilidad y escalabilidad del código:
-
-*   **`com.example.demo.model` (Entidades JPA):** Son clases Java (POJOs) que representan fielmente las tablas de la base de datos PostgreSQL. Usamos anotaciones de Hibernate (`@Entity`, `@Table`, `@Id`) para el mapeo objeto-relacional (ORM).
-*   **`com.example.demo.repository` (Interfaces de Persistencia):** Aprovechamos **Spring Data JPA**. Al heredar de `JpaRepository`, Spring genera automáticamente las operaciones CRUD, evitando el uso de SQL manual propenso a errores.
-*   **`com.example.demo.service` (Lógica de Negocio):** Esta capa encapsula las reglas académicas y de negocio de la escuela, manteniendo los controladores livianos y enfocados únicamente en el flujo web.
-*   **`com.example.demo.controller` (Manejadores MVC):** Gestionan las peticiones HTTP, interactúan con la capa de servicios e inyectan datos en las vistas de **Thymeleaf**.
+Este documento profundiza en el diseño de ingeniería del software aplicado a la **Academia Roller Speed**. Es la base técnica que justifica el uso de **Spring Boot 3**.
 
 ---
 
-## 🛠️ 2. Principios de Diseño Aplicados (SOLID)
+## 🏛️ 1. Patrón Arquitectónico: N-Tier (Por Capas)
+Hemos implementado una separación física y lógica de responsabilidades para evitar el "Big Ball of Mud" (código espagueti).
 
-### Responsabilidad Única (SRP)
-Cada paquete y clase tiene una misión clara: los repositorios solo hablan con la base de datos, los servicios ejecutan lógica y los controladores manejan el tráfico web.
+### A. Capa de Dominio (Paquete `model`)
+*   **Entidades:** Clases como `Estudiante`, `Pago` y `Testimonio`.
+*   **Tecnología:** **JPA (Java Persistence API)**.
+*   **Detalle:** "Cada clase es un espejo de una tabla en PostgreSQL. Usamos anotaciones `@Column(nullable = false)` para forzar la integridad de datos desde el corazón de la aplicación, no solo en la DB."
 
-### Inversión de Control (IoC) y DI
-No instanciamos clases manualmente con `new` dentro de otras. Usamos **Inyección de Dependencias** mediante la anotación `@Autowired`, permitiendo que Spring gestione el ciclo de vida de los objetos (Beans).
+### B. Capa de Acceso a Datos (Paquete `repository`)
+*   **Componentes:** Interfaces que extienden `JpaRepository<T, ID>`.
+*   **Abstracción:** "Esta capa implementa el **patrón Repository**. No escribimos SQL manual; Spring genera los Proxies en tiempo de ejecución. Esto nos protege contra inyecciones SQL y garantiza que el código sea agnóstico a la base de datos (podríamos cambiar de PostgreSQL a MySQL sin tocar una sola línea de código Java)."
 
-### Segregación de Interfaces
-Nuestros repositorios son interfaces limpias que exponen solo lo necesario para la persistencia de datos, siguiendo el contrato de Spring Data.
+### C. Capa de Servicio (Paquete `service`)
+*   **Componentes:** Clases anotadas con `@Service`.
+*   **Lógica:** "Es la orquestadora. Aquí se manejan las transacciones (`@Transactional`). Si un pago falla a mitad de camino, la base de datos hace rollback automático, manteniendo la consistencia."
+
+### D. Capa de Presentación (Paquete `controller`)
+*   **Componentes:** Clases anotadas con `@Controller`.
+*   **Motor de Plantillas:** **Thymeleaf**.
+*   **MVC:** "Implementamos el patrón **Model-View-Controller**. El controlador recibe el `Model` de Spring, le inyecta los objetos de negocio y lo entrega a la `View` (HTML). La lógica de renderizado se queda en el servidor (Server-Side Rendering), lo que mejora el SEO y la seguridad."
 
 ---
 
-## 📑 3. Relación de Clases Principales
+## 🛠️ 2. Cumplimiento de Principios SOLID
 
-| Capa | Clases de Ejemplo |
+| Principio | Aplicación en el Proyecto |
 | :--- | :--- |
-| **Model** | `Estudiante`, `Instructor`, `Clase`, `Pago`, `Usuario`, `Noticia`, `Testimonio`, `Evento`. |
-| **Repository** | `EstudianteRepository`, `ClaseRepository`, `NoticiaRepository`, `TestimonioRepository`. |
-| **Service** | `EscuelaService`. |
-| **Controller** | `EscuelaController`, `DashboardController`, `IndexController`, `AuthController`. |
+| **S**ingle Responsibility (SRP) | Los Repositorios solo persisten. Los Servicios solo ejecutan lógica. Los Controladores solo enrutan. |
+| **O**pen/Closed (OCP) | El sistema está diseñado para extenderse (ej. nuevos tipos de Pagos) sin modificar la lógica base del `IndexController`. |
+| **L**iskov Substitution | Usamos herencia estándar y cumplimos los contratos de las interfaces de Spring. |
+| **I**nterface Segregation | Preferimos interfaces pequeñas. Noten cómo cada entidad tiene su propio Repositorio especializado. |
+| **D**ependency Inversion | **Inyección de Dependencias (DI)**. Inyectamos interfaces, no implementaciones concretas, facilitando el desacoplamiento. |
 
 ---
 
-> [!IMPORTANT]
-> Esta estructura permite que el sistema sea fácil de testear (Unit Testing) y esté listo para una migración rápida a microservicios si el negocio lo requiere en el futuro.
+## 🛡️ 3. Seguridad a Nivel de Clase (`SecurityConfig`)
+*   **BCrypt:** "Las contraseñas nunca fluyen en texto plano. Usamos `BCryptPasswordEncoder` (fuerza 10) para el hash."
+*   **RBAC:** "El control de acceso está centralizado. Si el día de mañana queremos añadir un rol de 'Invitado', solo modificamos una línea en la configuración de seguridad, sin tocar los controladores."
+
+---
+
+## 📂 4. Mapa de Relaciones (Para el Profesor)
+*   **IndexController** → **TestimonioRepository** (Lectura de comunidad)
+*   **DataSeeder** → **Todos los Repositorios** (Bootstrap de datos)
+*   **SecurityConfig** → **UsuarioRepository** (Autenticación)
+
+---
+
+> [!TIP]
+> **Defensa del Proyecto:** "Profesor, el código no solo funciona; está **diseñado para crecer**. La estructura de estas clases permite integrar pruebas unitarias con JUnit y Mockito de manera natural gracias a la inyección de dependencias."
